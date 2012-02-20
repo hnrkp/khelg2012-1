@@ -136,7 +136,7 @@ int	main (void) {
 		else
 			pPIO->PIO_SODR = LED1;					// turn LED1 (DS1) off
 		
-		for (j = 1000000; j != 0; j-- );			// wait 1 second  2000000
+		for (j = 3000000; j != 0; j-- );			// wait 1 second  2000000
 	
 		IdleCount++;								// count # of times through the idle loop
 
