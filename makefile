@@ -109,14 +109,14 @@ $(THUMBOBJFILES) : ${builddir}/${thumbdir}/%.o:%.c
 $(THUMBDEPFILES) : ${builddir}/${thumbdir}/%.d:%.c
 		@echo "... thumb dep $@"; \
 		rm -f $@; \
-		$(CC) $(COMPILEROPTIONS) -M -mthumb $< > $@.$$$$; \
+		${CC} $(COMPILEROPTIONS) -M -mthumb $< > $@.$$$$; \
 		sed 's,\($*\)\.o[ :]*, ${builddir}/${thumbdir}/\1.o $@ : ,g' < $@.$$$$ > $@; \
 		rm -f $@.$$$$
 
 $(ARMDEPFILES) : ${builddir}/${armdir}/%.d:%.c
 		@echo "... arm dep $@"; \
 		rm -f $@; \
-		$(CC) $(COMPILEROPTIONS) -M $< > $@.$$$$; \
+		${CC} $(COMPILEROPTIONS) -M $< > $@.$$$$; \
 		sed 's,\($*\)\.o[ :]*, ${builddir}/${armdir}/\1.o $@ : ,g' < $@.$$$$ > $@; \
 		rm -f $@.$$$$
 
@@ -135,15 +135,15 @@ mkdirs:
 	
 clean:
 	@echo ... removing build files in ${builddir}
-	@rm -rf ${builddir}/${armdir}/*.o
-	@rm -rf ${builddir}/${thumbdir}/*.o
-	@rm -rf ${builddir}/${armdir}/*.d
-	@rm -rf ${builddir}/${thumbdir}/*.d
-	@rm -rf ${builddir}/*.out
-	@rm -rf ${builddir}/*.hex
-	@rm -rf ${builddir}/*.elf
-	@rm -rf ${builddir}/*.map
-	@rm -rf ${builddir}/*_disasm.s
+	@rm -f ${builddir}/${armdir}/*.o
+	@rm -f ${builddir}/${thumbdir}/*.o
+	@rm -f ${builddir}/${armdir}/*.d
+	@rm -f ${builddir}/${thumbdir}/*.d
+	@rm -f ${builddir}/*.out
+	@rm -f ${builddir}/*.hex
+	@rm -f ${builddir}/*.elf
+	@rm -f ${builddir}/*.map
+	@rm -f ${builddir}/*_disasm.s
 
 install: $(BINARY)
 	@sed 's/BUILDFILE/${builddir}\/${BINARY}.out/' sam7flash.script >_sam7flash.script

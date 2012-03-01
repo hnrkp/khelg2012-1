@@ -1,37 +1,22 @@
-//  *****************************************************************************
-//   						main.c
-// 
-//     Demonstration program for Olimex SAM7-H256 Evaluation Board
-//
-//     blinks LED0 (pin PA8) with an endless loop
-//
-//  Authors:  James P Lynch  September 23, 2006; Olimex, Mar 2007
-//  *****************************************************************************
- 
-//  *******************************************************
-//                Header Files
-//  *******************************************************
-//#include "lib_AT91SAM7S256.h"
-
 #include "AT91SAM7S256.h"
-
 #include "board.h"
-
-
 #include "cdc_enumerate.h"
 
+// FIXME fix the lib_* include so that this isn't needed anymore!
 extern void Usart_init ( void );
-extern void AT91F_US_Put( char *buffer); // \arg pointer to a string ending by \0
+extern void AT91F_US_Put( char *buffer);
 
-//  *******************************************************
-//                Function Prototypes
-//  *******************************************************
+extern void AT91F_PIO_CfgOutput(
+		AT91PS_PIO pPio,             // \arg pointer to a PIO controller
+		unsigned int pioEnable);
+
+extern void AT91F_PIO_ClearOutput(
+	AT91PS_PIO pPio,   // \arg  pointer to a PIO controller
+	unsigned int flag);
+
 void Timer0IrqHandler(void);
 void FiqHandler(void);
 
-//  *******************************************************
-//                External References
-//  *******************************************************
 extern	void LowLevelInit(void);
 extern	void TimerSetup(void);
 extern	unsigned enableIRQ(void);
