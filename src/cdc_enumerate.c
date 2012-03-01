@@ -17,7 +17,7 @@
 //*----------------------------------------------------------------------------
 #include "cdc_enumerate.h"
 
-#include "AT91SAM7S-EK.h"
+//#include "AT91SAM7S-EK.h"
 #include "AT91SAM7S256.h"
 //#include "lib_AT91SAM7S256.h"
 

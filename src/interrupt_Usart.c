@@ -16,7 +16,7 @@
 
 
 // Include Standard LIB  files
-#include "AT91SAM7S-EK.h"
+//#include "AT91SAM7S-EK.h"
 #include "AT91SAM7S256.h"
 #include "lib_AT91SAM7S256.h"
 
@@ -66,7 +66,7 @@ void Usart_c_irq_handler(void)
 
 	if ( status & AT91C_US_RXBUFF){
 	//* Toggel LED
- 	Trace_Toggel_LED( AT91B_LED2) ;
+ 	//Trace_Toggel_LED( AT91B_LED2) ;
 	//* transfert the char to DBGU
 	 if ( first == 0){
  	     COM0->US_RPR = (unsigned int) buff_rx1;
@@ -83,7 +83,7 @@ void Usart_c_irq_handler(void)
 //* Check error
 
 	if ( status & AT91C_US_TIMEOUT){
-	 Trace_Toggel_LED( AT91B_LED2) ;
+	 //Trace_Toggel_LED( AT91B_LED2) ;
 	 status = 100 - COM0->US_RCR;
 	 if  (status !=0){
  	   if ( first == 0){
@@ -137,7 +137,7 @@ void Usart_init ( void )
 
     //* First, enable the clock of the PIOB
     AT91F_PMC_EnablePeriphClock ( AT91C_BASE_PMC, 1 << AT91C_ID_US0 ) ;
-
+#define AT91B_MCK             ((18432000*73/14)/2)
     //* Usart Configure
     AT91F_US_Configure (COM0, AT91B_MCK,AT91C_US_ASYNC_MODE,USART_BAUD_RATE , 0);
 

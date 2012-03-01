@@ -13,11 +13,12 @@
 //  *******************************************************
 #include "AT91SAM7S256.h"
 #include "board.h"
-
 #include "cdc_enumerate.h"
+
+#if 0
 extern void Usart_init ( void );
 extern void AT91F_US_Put( char *buffer); // \arg pointer to a string ending by \0
-
+#endif
 //  *******************************************************
 //                Function Prototypes
 //  *******************************************************
@@ -38,6 +39,7 @@ extern	unsigned enableFIQ(void);
 unsigned int	FiqCount = 0;		// global uninitialized variable		
 
 struct _AT91S_CDC 	pCDC;
+#if 0
 void AT91F_USB_Open(void)
 {
     // Set the PLL USB Divider
@@ -57,7 +59,7 @@ void AT91F_USB_Open(void)
     // CDC Open by structure initialization
     AT91F_CDC_Open(&pCDC, AT91C_BASE_UDP);
 }
-
+#endif
 //  *******************************************************
 //                     MAIN
 //  ******************************************************/
@@ -94,7 +96,6 @@ int	main (void) {
 	// PIO Set Output Data Register - turns off the four LEDs						
 	pPIO->PIO_SODR = LED_MASK;						
 	pPIO->PIO_CODR = LED1;
-	pPIO->PIO_SODR = LED1;
 	
 	// Set up the Advanced Interrupt Controller AIC for Timer 0
 	// --------------------------------------------------------
@@ -152,6 +153,7 @@ int	main (void) {
 	
 	enableIRQ();
 	enableFIQ();
+#if 0
 
     // Init USB device
    AT91F_USB_Open();
@@ -182,7 +184,7 @@ int	main (void) {
     	//AT91F_US_PutChar(COM0, 'U');
    }
 
-
+#endif
 	// endless background blink loop
 	// -----------------------------
 	
