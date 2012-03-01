@@ -6,8 +6,8 @@ BINARY = sketnisse
 #
 ############
 
-cc = none-eabi
-basetoolsdir = ~/toolchain/arm-2011.09
+CROSS_COMPILE=arm-none-eabi-
+
 sourcedir = src
 builddir = build
 armdir = arm
@@ -19,11 +19,11 @@ thumbdir = thumb
 #
 #############
 
-CC = ${basetoolsdir}/bin/arm-$(cc)-gcc $(COMPILEROPTIONS)
-AS = ${basetoolsdir}/bin/arm-$(cc)-gcc $(ASSEMBLEROPTIONS)
-LD = ${basetoolsdir}/bin/arm-$(cc)-ld
-OBJCOPY = ${basetoolsdir}/bin/arm-$(cc)-objcopy
-OBJDUMP = ${basetoolsdir}/bin/arm-$(cc)-objdump
+CC = $(CROSS_COMPILE)gcc $(COMPILEROPTIONS)
+AS = $(CROSS_COMPILE)gcc $(ASSEMBLEROPTIONS)
+LD = $(CROSS_COMPILE)ld
+OBJCOPY = $(CROSS_COMPILE)objcopy
+OBJDUMP = $(CROSS_COMPILE)objdump
 MKDIR = mkdir -p
 
 ###############
