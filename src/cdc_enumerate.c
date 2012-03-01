@@ -16,11 +16,7 @@
 //* 1.2 30-Jun-2006 JPP : Set in AT91C_UDP_EPTYPE_INT_IN
 //*----------------------------------------------------------------------------
 #include "cdc_enumerate.h"
-
-//#include "AT91SAM7S-EK.h"
 #include "AT91SAM7S256.h"
-//#include "lib_AT91SAM7S256.h"
-
 
 typedef unsigned char  uchar;
 typedef unsigned short ushort;
@@ -308,8 +304,8 @@ static uint AT91F_UDP_Write(AT91PS_CDC pCdc, const char *pData, uint length)
 //* \fn    AT91F_USB_SendData
 //* \brief Send Data through the control endpoint
 //*----------------------------------------------------------------------------
-unsigned int csrTab[100];
-unsigned char csrIdx = 0;
+//unsigned int csrTab[100];
+//unsigned char csrIdx = 0;
 
 static void AT91F_USB_SendData(AT91PS_UDP pUdp, const char *pData, uint length)
 {
