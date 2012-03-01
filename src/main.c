@@ -189,6 +189,9 @@ int	main (void) {
 
 	  length = pCDC.Read(&pCDC, data, MSG_SIZE);
   	  data[length]=0;
+
+  	  pCDC.Write(&pCDC, data, length);
+
 	  //Trace_Toggel_LED( AT91B_LED1) ;
         AT91F_US_Put(data);
         //
