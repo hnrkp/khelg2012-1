@@ -11,8 +11,12 @@
 //  *******************************************************
 //                Header Files
 //  *******************************************************
+//#include "lib_AT91SAM7S256.h"
+
 #include "AT91SAM7S256.h"
+
 #include "board.h"
+
 
 #include "cdc_enumerate.h"
 
@@ -157,12 +161,15 @@ int	main (void) {
     // Init USB device
    AT91F_USB_Open();
 
-#define MSG_SIZE 				1000
+#define MSG_SIZE 				100
 
 
     // Init USB device
     // Wait for the end of enumeration
    while (!pCDC.IsConfigured(&pCDC));
+
+   pPIO->PIO_CODR = LED1;
+   //while(1);
 
   //* Set led 1e LED's.
     //AT91F_PIO_ClearOutput( AT91C_BASE_PIOA, AT91B_LED1 ) ;
@@ -175,18 +182,23 @@ int	main (void) {
     char data[MSG_SIZE];
     while (1)
    {       // Loop
-    	pPIO->PIO_CODR = LED1;
-	length = pCDC.Read(&pCDC, data, MSG_SIZE);
-  	 data[length]=0;
+		if  ((pPIO->PIO_ODSR & LED1) == LED1)		// read previous state of LED1
+			pPIO->PIO_CODR = LED1;					// turn LED1 (DS1) on
+		else
+			pPIO->PIO_SODR = LED1; // turn LED1 (DS1) off
+
+	  length = pCDC.Read(&pCDC, data, MSG_SIZE);
+  	  data[length]=0;
 	  //Trace_Toggel_LED( AT91B_LED1) ;
-          AT91F_US_Put(data);
-          AT91F_US_Put("arne\0");
+        AT91F_US_Put(data);
+        //
+        AT91F_US_Put("arne\n\0");
     	  //AT91F_US_PutChar(COM0, 'U');
    }
 
 	// endless background blink loop
 	// -----------------------------
-	
+
 	while (1) {
 		if  ((pPIO->PIO_ODSR & LED1) == LED1)		// read previous state of LED1
 			pPIO->PIO_CODR = LED1;					// turn LED1 (DS1) on	
