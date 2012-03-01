@@ -36,8 +36,9 @@ INCLUDE_DIRECTIVES = -I./${sourcedir}
 COMPILEROPTIONS = $(INCLUDE_DIRECTIVES) -mcpu=arm7tdmi -mlittle-endian -Os -mthumb-interwork -Wall -mapcs-frame
 ASSEMBLEROPTIONS = $(INCLUDE_DIRECTIVES) -mcpu=arm7tdmi -mlittle-endian -x assembler-with-cpp -mthumb-interwork
 LINKERSCRIPT = arm.ld
-LINKEROPTIONS = 
-OBJCOPYOPTIONS = -O ihex ${builddir}/$(BINARY).elf
+LINKEROPTIONS = -e 0
+OBJCOPYOPTIONS_HEX = -O ihex ${builddir}/$(BINARY).elf
+OBJCOPYOPTIONS_BIN = -O binary ${builddir}/$(BINARY).elf
 
 ###############
 #
@@ -79,9 +80,9 @@ DEPENDENCIES = $(THUMBDEPFILES) $(ARMDEPFILES)
 $(BINARY): $(ALLOBJFILES)
 	@echo "... linking"
 	@${LD} $(LINKEROPTIONS) -T $(LINKERSCRIPT) -Map ${builddir}/$(BINARY).map -o ${builddir}/$(BINARY).elf $(ALLOBJFILES) $(LIBS)
-	@${LD} -e 0 -o ${builddir}/$(BINARY).out -T $(LINKERSCRIPT) $(ALLOBJFILES) $(LIBS)
 	@echo "... objcopy"
-	@${OBJCOPY} $(OBJCOPYOPTIONS) ${builddir}/$(BINARY)$(BINARYEXT) 
+	@${OBJCOPY} $(OBJCOPYOPTIONS_BIN) ${builddir}/$(BINARY).out
+	@${OBJCOPY} $(OBJCOPYOPTIONS_HEX) ${builddir}/$(BINARY)$(BINARYEXT) 
 	@echo "... disasm"
 	@${OBJDUMP} -d -S ${builddir}/$(BINARY).elf > ${builddir}/$(BINARY)_disasm.s  
 
@@ -143,6 +144,6 @@ clean:
 	@rm -rf ${builddir}/*_disasm.s
 
 install: $(BINARY)
-	@sed 's/BUILDFILE/${builddir}\/${BINARY}${BINARYEXT}/' sam7flash.script >_sam7flash.script
+	@sed 's/BUILDFILE/${builddir}\/${BINARY}.out/' sam7flash.script >_sam7flash.script
 	@echo "script _sam7flash.script\nexit\n" | telnet localhost 4444
 	

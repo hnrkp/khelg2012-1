@@ -38,8 +38,8 @@ unsigned int	FiqCount = 0;		// global uninitialized variable
 //                     MAIN
 //  ******************************************************/
 int	main (void) {
-	unsigned long	j;								// loop counter (stack variable)
-	unsigned long	IdleCount = 0;					// idle loop blink counter (2x)
+	volatile unsigned long	j;								// loop counter (stack variable)
+	volatile unsigned long	IdleCount = 0;					// idle loop blink counter (2x)
 	
 	// Initialize the Atmel AT91SAM7S256 (watchdog, PLL clock, default interrupts, etc.)
 	// ---------------------------------------------------------------------------------

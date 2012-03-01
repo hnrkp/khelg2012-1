@@ -5,4 +5,5 @@ flash protect 0 0 15 off
 flash erase_sector 0 0 15
 flash write_bank 0 BUILDFILE 0
 mww 0xfffffd08 0xa5000401
+reset
 exit
