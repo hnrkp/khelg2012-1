@@ -126,6 +126,7 @@ SECTIONS
 	
 	.text :								/* collect all sections that should go into FLASH after startup  */ 
 	{
+	    *crt.o (.text)					/* boot code */
 		*(.text)						/* all .text sections (code)  */
 		*(.text.*)
 		*(.gnu.linkonce.t.*)
@@ -143,6 +144,7 @@ SECTIONS
 	{
 		_data = .;						/* create a global symbol marking the start of the .data section  */
 		*(.data)						/* all .data sections  */
+		. = ALIGN(4);
 		_edata = .;						/* define a global symbol marking the end of the .data section  */
 	} >ram AT >flash          			/* put all the above into RAM (but load the LMA initializer copy into FLASH)  */
 
