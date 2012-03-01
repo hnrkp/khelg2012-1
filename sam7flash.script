@@ -1,3 +1,4 @@
+reset init
 halt   
 flash info 0
 flash probe 0
