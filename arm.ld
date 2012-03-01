@@ -117,7 +117,7 @@ MEMORY
 
 
 /* define a global symbol _stack_end  (see analysis in annotation above) */
-_stack_end = 0x203FFC;
+_stack_end = 0x20FFFC;
 
 /* now define the output sections  */
 SECTIONS 
