@@ -141,3 +141,8 @@ clean:
 	@rm -rf ${builddir}/*.elf
 	@rm -rf ${builddir}/*.map
 	@rm -rf ${builddir}/*_disasm.s
+
+install: $(BINARY)
+	@sed 's/BUILDFILE/${builddir}\/${BINARY}${BINARYEXT}/' sam7flash.script >_sam7flash.script
+	@echo "script _sam7flash.script\nexit\n" | telnet localhost 4444
+	
