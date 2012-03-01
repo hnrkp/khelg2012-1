@@ -150,8 +150,4 @@ SECTIONS
 	. = ALIGN(4);						/* advance location counter to the next 32-bit boundary */
 	_bss_end = . ;						/* define a global symbol marking the end of the .bss section */
 	_end = .;							/* define a global symbol marking the end of application RAM */
-   .ARM.extab   : { *(.ARM.extab*) } >flash
-   __exidx_start = .;
-  .ARM.exidx   : { *(.ARM.exidx*) } >flash
-   __exidx_end = .;
 }
