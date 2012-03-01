@@ -46,9 +46,9 @@ OBJCOPYOPTIONS_BIN = -O binary ${builddir}/$(BINARY).elf
 #
 ###############
 
-ASFILES = crt.s
-THUMBFILES = blinker.c lowlevelinit.c main.c timerisr.c timersetup.c
-ARMFILES = isrsupport.c 
+ASFILES = crt.s fundamentals.s
+THUMBFILES = blinker.c lowlevelinit.c main.c timerisr.c timersetup.c cdc_enumerate.c interrupt_Usart.c
+ARMFILES = isrsupport.c
 
 LIBS=
 
