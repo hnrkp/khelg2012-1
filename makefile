@@ -33,8 +33,8 @@ MKDIR = mkdir -p
 ###############
 
 INCLUDE_DIRECTIVES = -I./${sourcedir} 
-COMPILEROPTIONS = $(INCLUDE_DIRECTIVES) -mcpu=arm7tdmi -mlittle-endian -Os# -mthumb-interwork -Wall -mapcs-frame
-ASSEMBLEROPTIONS = $(INCLUDE_DIRECTIVES) -mcpu=arm7tdmi -mlittle-endian #-x assembler-with-cpp -mthumb-interwork
+COMPILEROPTIONS = $(INCLUDE_DIRECTIVES) -mcpu=arm7tdmi -mlittle-endian -Os -mthumb-interwork -Wall -mapcs-frame -gdwarf-2
+ASSEMBLEROPTIONS = $(INCLUDE_DIRECTIVES) -mcpu=arm7tdmi -mlittle-endian -x assembler-with-cpp -mthumb-interwork -gdwarf-2
 LINKERSCRIPT = arm.ld
 LINKEROPTIONS = -e 0
 OBJCOPYOPTIONS_HEX = -O ihex ${builddir}/$(BINARY).elf
@@ -47,8 +47,8 @@ OBJCOPYOPTIONS_BIN = -O binary ${builddir}/$(BINARY).elf
 ###############
 
 ASFILES = crt.s fundamentals.s
-THUMBFILES = 
-ARMFILES = blinker.c lowlevelinit.c main.c timerisr.c timersetup.c interrupt_Usart.c cdc_enumerate.c 
+THUMBFILES = blinker.c lowlevelinit.c main.c timerisr.c timersetup.c interrupt_Usart.c cdc_enumerate.c
+ARMFILES =   
 ARMFILES += isrsupport.c
 
 LIBS=
