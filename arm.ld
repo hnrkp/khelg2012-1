@@ -127,10 +127,15 @@ SECTIONS
 	.text :								/* collect all sections that should go into FLASH after startup  */ 
 	{
 		*(.text)						/* all .text sections (code)  */
+		*(.text.*)
+		*(.gnu.linkonce.t.*)
 		*(.rodata)						/* all .rodata sections (constants, strings, etc.)  */
 		*(.rodata*)						/* all .rodata* sections (constants, strings, etc.)  */
 		*(.glue_7)						/* all .glue_7 sections  (no idea what these are) */
 		*(.glue_7t)						/* all .glue_7t sections (no idea what these are) */
+		*(.gcc_except_table)
+		*(.gnu.linkonce.r.*)
+		. = ALIGN(4);
 		_etext = .;						/* define a global symbol _etext just after the last code byte */
 	} >flash							/* put all the above into FLASH */
 
@@ -145,6 +150,8 @@ SECTIONS
 	{
 		_bss_start = .;					/* define a global symbol marking the start of the .bss section */
 		*(.bss)							/* all .bss sections  */
+		*(.gnu.linkonce.b.*)
+		*(COMMON)
 	} >ram								/* put all the above in RAM (it will be cleared in the startup code */
 
 	. = ALIGN(4);						/* advance location counter to the next 32-bit boundary */
