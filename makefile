@@ -144,6 +144,7 @@ clean:
 	@rm -f ${builddir}/*.elf
 	@rm -f ${builddir}/*.map
 	@rm -f ${builddir}/*_disasm.s
+	@rm -f _sam7flash.script
 
 install: $(BINARY)
 	@sed 's/BUILDFILE/${builddir}\/${BINARY}.out/' sam7flash.script >_sam7flash.script
