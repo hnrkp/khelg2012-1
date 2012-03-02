@@ -87,7 +87,8 @@ $(BINARY): $(ALLOBJFILES)
 	@${OBJCOPY} $(OBJCOPYOPTIONS_BIN) ${builddir}/$(BINARY).out
 	@${OBJCOPY} $(OBJCOPYOPTIONS_HEX) ${builddir}/$(BINARY)$(BINARYEXT) 
 	@echo "... disasm"
-	@${OBJDUMP} -d -S ${builddir}/$(BINARY).elf > ${builddir}/$(BINARY)_disasm.s  
+	@${OBJDUMP} -d -S ${builddir}/$(BINARY).elf > ${builddir}/$(BINARY)_disasm.s
+	@echo "${BINARY}.out is `du -b ${builddir}/${BINARY}.out | sed 's/\([0-9]*\).*/\1/g '` bytes on flash"
 
 -include $(DEPENDENCIES)	   	
 
