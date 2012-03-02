@@ -147,5 +147,5 @@ clean:
 
 install: $(BINARY)
 	@sed 's/BUILDFILE/${builddir}\/${BINARY}.out/' sam7flash.script >_sam7flash.script
-	@echo "script _sam7flash.script\nexit\n" | telnet localhost 4444
+	@echo "script _sam7flash.script\nexit\n" | nc localhost 4444
 	
