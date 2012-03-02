@@ -2,9 +2,15 @@
 #include "board.h"
 #include "cdc_enumerate.h"
 
+
+extern	void LowLevelInit(void);
+
+
 // FIXME fix the lib_* include so that this isn't needed anymore!
 extern void Usart_init ( void );
-extern void AT91F_US_Put( char *buffer);
+
+// This is used for putchar over serial, but let's use USB CDC ACM
+//extern void AT91F_US_Put( char *buffer);
 
 extern void AT91F_PIO_CfgOutput(
 		AT91PS_PIO pPio,             // \arg pointer to a PIO controller
@@ -14,18 +20,21 @@ extern void AT91F_PIO_ClearOutput(
 	AT91PS_PIO pPio,   // \arg  pointer to a PIO controller
 	unsigned int flag);
 
+#if 0
 void Timer0IrqHandler(void);
 void FiqHandler(void);
 
-extern	void LowLevelInit(void);
 extern	void TimerSetup(void);
 extern	unsigned enableIRQ(void);
 extern	unsigned enableFIQ(void);
+#endif
+
+#define MSG_SIZE 				100
 
 //  *******************************************************
 //               Global Variables
 //  *******************************************************
-unsigned int	FiqCount = 0;		// global uninitialized variable		
+unsigned int	FiqCount = 0;
 
 struct _AT91S_CDC 	pCDC;
 
@@ -49,43 +58,41 @@ void AT91F_USB_Open(void)
     AT91F_CDC_Open(&pCDC, AT91C_BASE_UDP);
 }
 
+__attribute__ ((section (".ramfunc")))
+void arne(void)
+{
+	pCDC.Write(&pCDC, "ARNEN!\n", 7);
+}
+
 //  *******************************************************
 //                     MAIN
 //  ******************************************************/
 int	main (void) {
+#if 0
 	unsigned volatile long	j;								// loop counter (stack variable)
 	unsigned long	IdleCount = 0;					// idle loop blink counter (2x)
+#endif
 	
 	// Initialize the Atmel AT91SAM7S256 (watchdog, PLL clock, default interrupts, etc.)
 	// ---------------------------------------------------------------------------------
 	LowLevelInit();
 
-
-	
-	// Turn on the peripheral clock for Timer0
-	// ---------------------------------------
-	
-	// pointer to PMC data structure
 	volatile AT91PS_PMC	pPMC = AT91C_BASE_PMC;
 	
 	// enable Timer0 peripheral clock		
 	pPMC->PMC_PCER = (1<<AT91C_ID_TC0);	
 	
 	
-	// Set up the PIO ports
-	// --------------------			
-
-	// pointer to PIO data structure
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
 
-
-	// PIO Output Enable Register - sets pins P0 - P3 to outputs			
+	// PIO Output Enable Register - sets pins P0 - P3 to outputs
 	pPIO->PIO_OER = LED_MASK;
 	
-	// PIO Set Output Data Register - turns off the four LEDs						
+	// PIO Set Output Data Register - turns off the four LEDs
 	pPIO->PIO_SODR = LED_MASK;						
 	pPIO->PIO_CODR = LED1;
-	
+
+#if 0
 	// Set up the Advanced Interrupt Controller AIC for Timer 0
 	// --------------------------------------------------------
 	
@@ -108,9 +115,7 @@ int	main (void) {
 	pAIC->AIC_IDCR = (0<<AT91C_ID_TC0);											
 	
 	// Enable the TC0 interrupt in AIC Interrupt Enable Command Register
-	pAIC->AIC_IECR = (1<<AT91C_ID_TC0); 										
-	
-	
+	pAIC->AIC_IECR = (1<<AT91C_ID_TC0);
 	
 	// Set up the Advanced Interrupt Controller AIC for FIQ (pushbutton SW1)
 	// ---------------------------------------------------------------------
@@ -142,61 +147,35 @@ int	main (void) {
 	
 	enableIRQ();
 	enableFIQ();
+#endif
 
     // Init USB device
    AT91F_USB_Open();
 
-#define MSG_SIZE 				100
-
-
     // Init USB device
     // Wait for the end of enumeration
-   while (!pCDC.IsConfigured(&pCDC));
+    while (!pCDC.IsConfigured(&pCDC));
 
-   pPIO->PIO_CODR = LED1;
-   //while(1);
+    pPIO->PIO_CODR = LED1;
+    //while(1);
 
-  //* Set led 1e LED's.
-    //AT91F_PIO_ClearOutput( AT91C_BASE_PIOA, AT91B_LED1 ) ;
     // Set Usart in interrupt
     Usart_init();
-   //* Set led all LED's.
-    //AT91F_PIO_ClearOutput( AT91C_BASE_PIOA, AT91B_LED_MASK ) ;
 
     int length;
     char data[MSG_SIZE];
     while (1)
-   {       // Loop
-		if  ((pPIO->PIO_ODSR & LED1) == LED1)		// read previous state of LED1
+    {
+    	if  ((pPIO->PIO_ODSR & LED1) == LED1)		// read previous state of LED1
 			pPIO->PIO_CODR = LED1;					// turn LED1 (DS1) on
 		else
 			pPIO->PIO_SODR = LED1; // turn LED1 (DS1) off
 
-	  length = pCDC.Read(&pCDC, data, MSG_SIZE);
-  	  data[length]=0;
+    	length = pCDC.Read(&pCDC, data, MSG_SIZE);
+    	data[length]=0;
 
-  	  pCDC.Write(&pCDC, data, length);
-
-	  //Trace_Toggel_LED( AT91B_LED1) ;
-        AT91F_US_Put(data);
-        //
-        AT91F_US_Put("arne\n\0");
-    	  //AT91F_US_PutChar(COM0, 'U');
-   }
-
-	// endless background blink loop
-	// -----------------------------
-
-	while (1) {
-		if  ((pPIO->PIO_ODSR & LED1) == LED1)		// read previous state of LED1
-			pPIO->PIO_CODR = LED1;					// turn LED1 (DS1) on	
-		else
-			pPIO->PIO_SODR = LED1; // turn LED1 (DS1) off
-		
-		for (j = 3000000; j != 0; j-- );			// wait 1 second  2000000
-	
-		IdleCount++;								// count # of times through the idle loop
-
-	}
+		  pCDC.Write(&pCDC, data, length);
+		  arne();
+    }
 }
 

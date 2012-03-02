@@ -143,6 +143,7 @@ SECTIONS
 	.data :								/* collect all initialized .data sections that go into RAM  */ 
 	{
 		_data = .;						/* create a global symbol marking the start of the .data section  */
+		*(.ramfunc)
 		*(.data)						/* all .data sections  */
 		. = ALIGN(4);
 		_edata = .;						/* define a global symbol marking the end of the .data section  */
