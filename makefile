@@ -22,6 +22,7 @@ thumbdir = thumb
 CC = $(CROSS_COMPILE)gcc $(COMPILEROPTIONS)
 AS = $(CROSS_COMPILE)gcc $(ASSEMBLEROPTIONS)
 LD = $(CROSS_COMPILE)ld
+GDB = $(CROSS_COMPILE)gdb
 OBJCOPY = $(CROSS_COMPILE)objcopy
 OBJDUMP = $(CROSS_COMPILE)objdump
 MKDIR = mkdir -p
@@ -150,3 +151,6 @@ install: $(BINARY)
 	@sed 's/BUILDFILE/${builddir}\/${BINARY}.out/' sam7flash.script >_sam7flash.script
 	@echo "script _sam7flash.script\nexit\n" | nc localhost 4444
 	
+
+debug: $(BINARY)
+	@${GDB} ${builddir}/${BINARY}.elf -x debug.gdb
