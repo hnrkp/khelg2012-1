@@ -2,10 +2,11 @@
 #include "board.h"
 #include "cdc_enumerate.h"
 #include "soft_synth.h"
+//#include "lib_AT91SAM7S256.h"
 
 
 #define BLINK_DURING_USB_ENUM	0
-
+#define BLINK_AUDIO				1
 extern	void LowLevelInit(void);
 
 
@@ -69,11 +70,14 @@ void arne(void)
 }
 
 static void audio_dac(int vol) {
+#if BLINK_AUDIO
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
   	if  (vol > 0x80)
 		pPIO->PIO_CODR = LED1;
 	else
 		pPIO->PIO_SODR = LED1;
+#endif
+  	AT91C_BASE_PWMC_CH0->PWMC_CUPDR = vol+1; // errata for pwm on AT91 is thiiiiiiick, never do duty full nor low
 }
 
 void Timer0IrqHandler() {
@@ -113,6 +117,33 @@ int	main (void) {
     synth_init(&synth_dev, audio_dac, 2, 50);
     tune_init(&synth_dev);
     synth_dev.gain = 256/6;
+
+    //
+    // Set up pwm for doing dac stuff
+    //
+
+    // enable PWM peripheral on PA23
+    AT91F_PIO_CfgPeriph( AT91C_BASE_PIOA, 0, AT91C_PA23_PWM0);
+    // power things up
+    AT91F_PWMC_CfgPMC();
+    // set things up
+    AT91F_PWMC_StopChannel( AT91C_BASE_PWMC, AT91C_PWMC_CHID0 );
+   // CPRE = 10 : MCK/1024
+   // CALG = 0  : The period is left aligned
+   // CPOL = 1  : The output waveform starts at a high level
+   // CPD = 0   : Writing to the PWM_CUPDx will modify the duty cycle at the next period start event
+   AT91C_BASE_PWMC_CH0->PWMC_CMR =
+		   0x0 |   		// CPRE = Master CLK
+		   (0<<8) | 	// CALG 0 = left aligned period, 1 = center aligned
+		   (1<<9) |     // CPOL 0 start low, 1 start high
+		   (0<<10)      // CPD 0 modify duty cycle at next period, 1 modify period at next start event
+		   ;
+   // setup the period
+   AT91C_BASE_PWMC_CH0->PWMC_CPRDR = 258;
+   // setup the duty cycle )
+   AT91C_BASE_PWMC_CH0->PWMC_CDTYR = 1;
+   // enable PWM channel 0
+   AT91F_PWMC_StartChannel( AT91C_BASE_PWMC, AT91C_PWMC_CHID0 );
 
 
 	// Set up the Advanced Interrupt Controller AIC for Timer 0
