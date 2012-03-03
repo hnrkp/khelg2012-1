@@ -58,6 +58,34 @@ void AT91F_USB_Open(void)
     AT91F_CDC_Open(&pCDC, AT91C_BASE_UDP);
 }
 
+// TODO PETER move to elsewhere
+extern int _readDCCStat();
+extern int _readDCC();
+extern int _writeDCC();
+
+static int dcc_put_char(char c) {
+  int tmo = 0x10000;
+  while (--tmo > 0) {
+    if (!(_readDCCStat() & (1<<1))) {
+      _writeDCC(c);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int dcc_put_string(char *s) {
+  char c;
+  while ((c = *s++) != 0) {
+    if (!dcc_put_char(c)) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+// TODO PETER end
+
 __attribute__ ((section (".ramfunc")))
 void arne(void)
 {
@@ -148,14 +176,27 @@ int	main (void) {
 	enableIRQ();
 	enableFIQ();
 #endif
+ 
+   dcc_put_string("usb open\n");
 
     // Init USB device
    AT91F_USB_Open();
 
-    // Init USB device
-    // Wait for the end of enumeration
-    while (!pCDC.IsConfigured(&pCDC));
+   dcc_put_string("await enum\n");
 
+  // Init USB device
+    // Wait for the end of enumeration
+    int enum_led = 0;
+    while (!pCDC.IsConfigured(&pCDC)) {
+	// blink shortly during enumeration
+  	if  (7 & (enum_led++ >> 14))
+		pPIO->PIO_SODR = LED1;
+	else
+		pPIO->PIO_CODR = LED1;
+   }
+
+   dcc_put_string("enumerated and fine\n");
+   // yaay, connected
     pPIO->PIO_CODR = LED1;
     //while(1);
 

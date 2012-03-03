@@ -133,6 +133,28 @@ _divByZero:
         .size   _div, . - _div
         .endfunc
 
+        .global _readDCCStat
+        .func   _readDCCStat
+_readDCCStat:
+    mrc     P14,0,R0,C0,C0,0
+    bx      lr
+        .size   _readDCCStat, . - _readDCCStat
+        .endfunc
 
+        .global _readDCC
+        .func   _readDCC
+_readDCC:
+    mrc      P14,0,R0,C1,C0,0
+    bx       lr
+        .size   _readDCC, . - _readDCC
+        .endfunc
+
+        .global _writeDCC
+        .func   _writeDCC
+_writeDCC:
+    mcr      P14,0,R0,C1,C0,0
+    bx       lr
+        .size   _writeDCC, . - _writeDCC
+        .endfunc
 
   .end
