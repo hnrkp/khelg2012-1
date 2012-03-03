@@ -58,34 +58,6 @@ void AT91F_USB_Open(void)
     AT91F_CDC_Open(&pCDC, AT91C_BASE_UDP);
 }
 
-// TODO PETER move to elsewhere
-extern int _readDCCStat();
-extern int _readDCC();
-extern int _writeDCC();
-
-static int dcc_put_char(char c) {
-  int tmo = 0x10000;
-  while (--tmo > 0) {
-    if (!(_readDCCStat() & (1<<1))) {
-      _writeDCC(c);
-      return 1;
-    }
-  }
-  return 0;
-}
-
-static int dcc_put_string(char *s) {
-  char c;
-  while ((c = *s++) != 0) {
-    if (!dcc_put_char(c)) {
-      return 0;
-    }
-  }
-  return 1;
-}
-
-// TODO PETER end
-
 __attribute__ ((section (".ramfunc")))
 void arne(void)
 {
@@ -104,12 +76,12 @@ int	main (void) {
 	// Initialize the Atmel AT91SAM7S256 (watchdog, PLL clock, default interrupts, etc.)
 	// ---------------------------------------------------------------------------------
 	LowLevelInit();
-
+#ifdef PETER
 	volatile AT91PS_PMC	pPMC = AT91C_BASE_PMC;
-	
+
 	// enable Timer0 peripheral clock		
-	pPMC->PMC_PCER = (1<<AT91C_ID_TC0);	
-	
+	pPMC->PMC_PCER = (1<<AT91C_ID_TC0);
+#endif
 	
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
 
@@ -176,13 +148,8 @@ int	main (void) {
 	enableIRQ();
 	enableFIQ();
 #endif
- 
-   dcc_put_string("usb open\n");
-
     // Init USB device
    AT91F_USB_Open();
-
-   dcc_put_string("await enum\n");
 
   // Init USB device
     // Wait for the end of enumeration
@@ -195,13 +162,12 @@ int	main (void) {
 		pPIO->PIO_CODR = LED1;
    }
 
-   dcc_put_string("enumerated and fine\n");
    // yaay, connected
     pPIO->PIO_CODR = LED1;
     //while(1);
 
     // Set Usart in interrupt
-    Usart_init();
+    //Usart_init();
 
     int length;
     char data[MSG_SIZE];
@@ -214,9 +180,8 @@ int	main (void) {
 
     	length = pCDC.Read(&pCDC, data, MSG_SIZE);
     	data[length]=0;
-
-		  pCDC.Write(&pCDC, data, length);
-		  arne();
+		pCDC.Write(&pCDC, data, length);
+		arne();
     }
 }
 

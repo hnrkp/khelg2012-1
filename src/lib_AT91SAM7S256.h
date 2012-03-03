@@ -121,7 +121,7 @@ __inline void AT91F_AIC_ClearIt (
 __inline void AT91F_AIC_AcknowledgeIt (
 	AT91PS_AIC pAic)     // \arg pointer to the AIC registers
 {
-    pAic->AIC_EOICR = pAic->AIC_EOICR;
+    // PRETTY USELESS YES .. pAic->AIC_EOICR = pAic->AIC_EOICR;
 }
 
 //*----------------------------------------------------------------------------
