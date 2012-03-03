@@ -8,7 +8,7 @@
 //
 //  Author:  James P Lynch  July 1, 2006
 //  ***************************************************************************** 
-
+#if 0
 #include "AT91SAM7S256.h"
 #include "board.h"
 
@@ -26,3 +26,4 @@ void Timer0IrqHandler (void) {
 	tickcount++;										// increment the tick count
 
 }
+#endif

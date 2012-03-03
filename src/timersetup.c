@@ -119,11 +119,11 @@ void	TimerSetup(void) {
 	//       7          6     5            4      3       2             0         
 	//
 	//  CLOCK SELECTION	
-	//	TCCLKS = 000  TIMER_CLOCK1    (MCK/2    =  24027420 hz)              
+	//	TCCLKS = 000  TIMER_CLOCK1    (MCK/2    =  24027420 hz)  <===== this one is bad ass!
 	//	         001  TIMER_CLOCK2    (MCK/8    =   6006855 hz)                                   
 	//	         010  TIMER_CLOCK3    (MCK/32   =   1501713 hz)                                           
 	//	         011  TIMER_CLOCK4    (MCK/128  =    375428 hz)                                                
-	//	         100  TIMER_CLOCK5    (MCK/1024 =     46928 hz)   <===== we select this one                                       
+	//	         100  TIMER_CLOCK5    (MCK/1024 =     46928 hz)   //<===== we select this one  NO WE DONT JIM
 	//           101  XC0
 	//           101  XC1
 	//           101  XC2
@@ -176,7 +176,8 @@ void	TimerSetup(void) {
 	//          10 (falling edge of TIOA)
 	//          11 (each edge of TIOA)
 	//
-	pTC->TC_CMR = 0x4004;				// TCCLKS = 1 (TIMER_CLOCK5)
+	pTC->TC_CMR = 0x4000;
+	//pTC->TC_CMR = 0x4004;				// TCCLKS = 1 (TIMER_CLOCK5)
 										// CPCTRG = 1 (RC Compare resets the counter and restarts the clock)	
 										// WAVE   = 0 (Capture mode enabled)
 										
@@ -188,6 +189,7 @@ void	TimerSetup(void) {
 	//	|----------------------------------|----------------------------------------|
 	//   31                              16 15                                    0    
 	//	
+	// Jimmey boy, this is old:
 	//	Timer Calculation:   What count gives 50 msec time-out?
 	//
 	//     TIMER_CLOCK5 = MCK / 1024  = 48054841 / 1024  =  46928 hz
@@ -197,8 +199,10 @@ void	TimerSetup(void) {
 	//     A little algebra:  .050 sec = count * 21.3092396896*10**-6
 	//                        count =  .050 / 21.3092396896*10**-6
 	//                        count =  2346
-	//
-	pTC->TC_RC = 2346;										
+	//......................................
+	//pTC->TC_RC = 2346;
+	// nooo, give us a 32 kHz callback plz 48054841/2/32768 = 733
+	pTC->TC_RC = 733;
 
 
 	//		TC Interrupt Enable Register  TC_IER    (write-only)

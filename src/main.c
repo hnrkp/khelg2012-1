@@ -1,7 +1,10 @@
 #include "AT91SAM7S256.h"
 #include "board.h"
 #include "cdc_enumerate.h"
+#include "soft_synth.h"
 
+
+#define BLINK_DURING_USB_ENUM	0
 
 extern	void LowLevelInit(void);
 
@@ -37,6 +40,7 @@ extern	unsigned enableFIQ(void);
 unsigned int	FiqCount = 0;
 
 struct _AT91S_CDC 	pCDC;
+static struct SYNTH_Device_t synth_dev;
 
 void AT91F_USB_Open(void)
 {
@@ -64,6 +68,20 @@ void arne(void)
 	pCDC.Write(&pCDC, "ARNEN!\n", 7);
 }
 
+static void audio_dac(int vol) {
+	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
+  	if  (vol > 0x80)
+		pPIO->PIO_CODR = LED1;
+	else
+		pPIO->PIO_SODR = LED1;
+}
+
+void Timer0IrqHandler() {
+	volatile AT91PS_TC 		pTC = AT91C_BASE_TC0;		// pointer to timer channel 0 register structure
+	pTC->TC_SR++;									// read TC0 Status Register to clear it
+	synth_tick(&synth_dev);
+}
+
 //  *******************************************************
 //                     MAIN
 //  ******************************************************/
@@ -76,15 +94,12 @@ int	main (void) {
 	// Initialize the Atmel AT91SAM7S256 (watchdog, PLL clock, default interrupts, etc.)
 	// ---------------------------------------------------------------------------------
 	LowLevelInit();
-#ifdef PETER
-	volatile AT91PS_PMC	pPMC = AT91C_BASE_PMC;
 
+	volatile AT91PS_PMC	pPMC = AT91C_BASE_PMC;
 	// enable Timer0 peripheral clock		
 	pPMC->PMC_PCER = (1<<AT91C_ID_TC0);
-#endif
 	
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
-
 	// PIO Output Enable Register - sets pins P0 - P3 to outputs
 	pPIO->PIO_OER = LED_MASK;
 	
@@ -92,7 +107,14 @@ int	main (void) {
 	pPIO->PIO_SODR = LED_MASK;						
 	pPIO->PIO_CODR = LED1;
 
-#if 0
+	//
+	// Set up audio and tune
+	//
+    synth_init(&synth_dev, audio_dac, 2, 50);
+    tune_init(&synth_dev);
+    synth_dev.gain = 256/6;
+
+
 	// Set up the Advanced Interrupt Controller AIC for Timer 0
 	// --------------------------------------------------------
 	
@@ -117,6 +139,12 @@ int	main (void) {
 	// Enable the TC0 interrupt in AIC Interrupt Enable Command Register
 	pAIC->AIC_IECR = (1<<AT91C_ID_TC0);
 	
+	TimerSetup();
+
+	enableIRQ();
+
+
+#if 0
 	// Set up the Advanced Interrupt Controller AIC for FIQ (pushbutton SW1)
 	// ---------------------------------------------------------------------
 	
@@ -153,13 +181,17 @@ int	main (void) {
 
   // Init USB device
     // Wait for the end of enumeration
+#if BLINK_DURING_USB_ENUM
     int enum_led = 0;
+#endif
     while (!pCDC.IsConfigured(&pCDC)) {
+#if BLINK_DURING_USB_ENUM
 	// blink shortly during enumeration
   	if  (7 & (enum_led++ >> 14))
 		pPIO->PIO_SODR = LED1;
 	else
 		pPIO->PIO_CODR = LED1;
+#endif
    }
 
    // yaay, connected
