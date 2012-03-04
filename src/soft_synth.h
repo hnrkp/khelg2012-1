@@ -11,10 +11,31 @@
 #include "soft_synth_wfseq.h"
 #include "soft_synth_seq.h"
 
+#define	CHANNEL_DRUM_ENABLE	1
+#define	CHANNEL_BASS_ENABLE	1
+#define	CHANNEL_ACCO_ENABLE	1
+#define	CHANNEL_MELO_ENABLE	1
+
+enum soft_synth_channels_e {
+#if CHANNEL_DRUM_ENABLE
+	CHANNEL_DRUM,
+#endif
+#if CHANNEL_BASS_ENABLE
+	CHANNEL_BASS,
+#endif
+#if CHANNEL_ACCO_ENABLE
+	CHANNEL_ACCO,
+#endif
+#if CHANNEL_MELO_ENABLE
+	CHANNEL_MELO,
+#endif
+	CHANNEL_COUNT
+};
+
 #define FREQ_LOG_2 	15
 #define ACC_F		8
 #define ACC_O 		8
-#define CHANNELS 	4
+#define CHANNELS 	CHANNEL_COUNT
 
 typedef void (*synth_set_dac_f)(int out);
 

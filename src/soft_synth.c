@@ -15,8 +15,8 @@
 #define LINEAR_INTERPOLATION(factor, x, y, acc) (x) + ((factor) * ((y) - (x)) >> acc)
 #define MAX_OUT (1<<ACC_O)
 
-#define WFS__LOOP_NEVEREND		-2
-#define WFS__LOOP_FIRST			-1
+#define WFS__LOOP_NEVEREND		/*-2*/254
+#define WFS__LOOP_FIRST			/*-1*/255
 
 static const int TONE_TABLE[] = {
 	0x10, 0x11, 0x12, 0x13, 0x15, 0x16, 0x17, 0x18, 0x1a, 0x1b, 0x1d, 0x1f,
@@ -127,43 +127,35 @@ static void synth_sequenceChannel(struct SYNTH_Device_t* pDev, int channel) {
 			if (pSeq->flags & SEQ_FLAG_RESET_MOD_AT_TONE) {
 				pChannel->f_mod_count = 0;
 			}
-			break;
 		}
 		else if (cmd == SEQ_CMD_SET_SOUND) {
 			pSeq->waveform = data & 0x3;
 			pSeq->chord = (data >> 2) & 0xf;
 			pSeq->tremolo = (data >> 6) & 0xf;
-			break;
 		}
 		else if (cmd == SEQ_CMD_SET_PROPERTY) {
 			synth_prop_t* wf_prop =
 					synth_waveformChannelProperty(pChannel, data & 0xf);
 			*wf_prop = (data >> 4) & 0xfff;
-			break;
 		}
 		else if (cmd == SEQ_CMD_WAVEFORM) {
 			enum synth_waveform_property_e wf_prop = data & 0xf;
 			int commonWaveformSequence = (data >> 4) & 0x1f;
 			synth_setWaveformSeq(pDev, channel, wf_prop,
 					pDev->sequencer.common_waveform_sequences[commonWaveformSequence]);
-			break;
 		}
 		else if (cmd == SEQ_CMD_SET_FLAGS) {
 			pSeq->flags = data & 0xff;
-			break;
 		}
 		else if (cmd == SEQ_CMD_ENABLE_FLAGS) {
 			pSeq->flags |= data & 0xff;
-			break;
 		}
 		else if (cmd == SEQ_CMD_DISABLE_FLAGS) {
 			pSeq->flags &= ~(data & 0xff);
-			break;
 		}
 		else if (cmd == SEQ_CMD_END) {
 			pSeq->timer = data & 0xff;
 			keepGoing = 0;
-			break;
 		}
 		else if (cmd == SEQ_CMD_NEXT) {
 			pSeq->timer = 0;
@@ -174,8 +166,6 @@ static void synth_sequenceChannel(struct SYNTH_Device_t* pDev, int channel) {
 			}
 			track_selection = pSeq->map[pSeq->map_index];
 			pTrack = pSeq->tracks[track_selection];
-
-			break;
 		}
 
 #else
@@ -281,6 +271,7 @@ static void synth_waveformChannel(struct SYNTH_Channel_t* pChannel) {
 			// mask bit set for this waveform property, execute sequence
 			struct SYNTH_Waveform_Property_Sequence_t* pSequence =
 					&(pChannel->waveform_sequencer.prop_seq[wf_prop]);
+
 			if (pSequence->timer > 0) {
 				// pause
 				pSequence->timer--;
@@ -479,13 +470,10 @@ void synth_tick(struct SYNTH_Device_t* pDev) {
 			pDev->sequenceTimer = 0;
 			synth_sequence(pDev);
 		}
-
-
 		pDev->waveformTimer -= BASE_FREQ;
 		synth_waveform(pDev);
 	}
 	pDev->waveformTimer += pDev->waveformHz;
-
 
 	synth_output(pDev);
 }
@@ -541,6 +529,7 @@ void synth_init(struct SYNTH_Device_t* pDev, synth_set_dac_f f, int sequenceDiv,
 			pDev->channels[chan].waveform_sequencer.prop_seq[prop].timer = 0;
 			pDev->channels[chan].waveform_sequencer.prop_seq[prop].loop = WFS__LOOP_FIRST;
 		}
+
 	}
 	pDev->dac_f = f;
 	pDev->waveformTimer = BASE_FREQ;

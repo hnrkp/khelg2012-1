@@ -696,16 +696,16 @@ const short TRACKMELCODA[] = {
 
 		SEQ_PROPERTY(MODULATION_DELTA, 60),
 		SEQ_PROPERTY(MODULATION_FACTOR,220),
-		SEQ_TONE(12*5+0,6),SEQ_END(32),
+		SEQ_TONE(12*6+0,6),SEQ_END(32),
 		SEQ_PROPERTY(MODULATION_DELTA, 80),
 		SEQ_PROPERTY(MODULATION_FACTOR,230),
-		SEQ_TONE(12*4+0,6),SEQ_END(32),
+		SEQ_TONE(12*5+0,6),SEQ_END(32),
 		SEQ_PROPERTY(MODULATION_DELTA, 100),
 		SEQ_PROPERTY(MODULATION_FACTOR,240),
-		SEQ_TONE(12*3+0,6),SEQ_END(32),
+		SEQ_TONE(12*4+0,6),SEQ_END(32),
 		SEQ_PROPERTY(MODULATION_DELTA, 120),
 		SEQ_PROPERTY(MODULATION_FACTOR,250),
-		SEQ_TONE(12*2+0,6),SEQ_END(32),
+		SEQ_TONE(12*3+0,6),SEQ_END(32),
 		SEQ_NEXT
 };
 
@@ -730,9 +730,17 @@ const short TRACKMAP_CHAN3[] = {0,0,0,0,1,2,3,4,0,0,5,6,5,6,7,8};
 
 void tune_init(struct SYNTH_Device_t *pDev) {
 	synth_sequencer_init(pDev, (short**)ENVELOPES, (short**)TREMOLOS, (short**)CHORDS, (short**)COMMON);
-	synth_channel_sequencer_init(pDev, 0, 16, (short*)TRACKMAP_CHAN0, (short**)TRACKS_CHAN0);
-	synth_channel_sequencer_init(pDev, 1, 16, (short*)TRACKMAP_CHAN1, (short**)TRACKS_CHAN1);
-	synth_channel_sequencer_init(pDev, 2, 16, (short*)TRACKMAP_CHAN2, (short**)TRACKS_CHAN2);
-	synth_channel_sequencer_init(pDev, 3, 16, (short*)TRACKMAP_CHAN3, (short**)TRACKS_CHAN3);
+#if CHANNEL_DRUM_ENABLE
+	synth_channel_sequencer_init(pDev, CHANNEL_DRUM, 16, (short*)TRACKMAP_CHAN0, (short**)TRACKS_CHAN0);
+#endif
+#if CHANNEL_BASS_ENABLE
+	synth_channel_sequencer_init(pDev, CHANNEL_BASS, 16, (short*)TRACKMAP_CHAN1, (short**)TRACKS_CHAN1);
+#endif
+#if CHANNEL_ACCO_ENABLE
+	synth_channel_sequencer_init(pDev, CHANNEL_ACCO, 16, (short*)TRACKMAP_CHAN2, (short**)TRACKS_CHAN2);
+#endif
+#if CHANNEL_MELO_ENABLE
+	synth_channel_sequencer_init(pDev, CHANNEL_MELO, 16, (short*)TRACKMAP_CHAN3, (short**)TRACKS_CHAN3);
+#endif
 }
 

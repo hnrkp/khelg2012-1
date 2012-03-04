@@ -6,7 +6,9 @@
 
 
 #define BLINK_DURING_USB_ENUM	0
-#define BLINK_AUDIO				1
+#define BLINK_AUDIO				0
+#define BLINK_CPU_USAGE			1
+
 extern	void LowLevelInit(void);
 
 
@@ -77,13 +79,20 @@ static void audio_dac(int vol) {
 	else
 		pPIO->PIO_SODR = LED1;
 #endif
-  	AT91C_BASE_PWMC_CH0->PWMC_CUPDR = vol+1; // errata for pwm on AT91 is thiiiiiiick, never do duty full nor low
+  	AT91C_BASE_PWMC_CH0->PWMC_CUPDR = 257-vol; // errata for pwm on AT91 is thiiiiiiick, never do duty full nor low
 }
 
 void Timer0IrqHandler() {
+#if BLINK_CPU_USAGE
+	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
+	pPIO->PIO_SODR = LED1;
+#endif
 	volatile AT91PS_TC 		pTC = AT91C_BASE_TC0;		// pointer to timer channel 0 register structure
 	pTC->TC_SR++;									// read TC0 Status Register to clear it
 	synth_tick(&synth_dev);
+#if BLINK_CPU_USAGE
+	pPIO->PIO_CODR = LED1;
+#endif
 }
 
 //  *******************************************************
@@ -99,10 +108,6 @@ int	main (void) {
 	// ---------------------------------------------------------------------------------
 	LowLevelInit();
 
-	volatile AT91PS_PMC	pPMC = AT91C_BASE_PMC;
-	// enable Timer0 peripheral clock		
-	pPMC->PMC_PCER = (1<<AT91C_ID_TC0);
-	
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
 	// PIO Output Enable Register - sets pins P0 - P3 to outputs
 	pPIO->PIO_OER = LED_MASK;
@@ -140,7 +145,7 @@ int	main (void) {
 		   ;
    // setup the period
    AT91C_BASE_PWMC_CH0->PWMC_CPRDR = 258;
-   // setup the duty cycle )
+   // setup the duty cycle
    AT91C_BASE_PWMC_CH0->PWMC_CDTYR = 1;
    // enable PWM channel 0
    AT91F_PWMC_StartChannel( AT91C_BASE_PWMC, AT91C_PWMC_CHID0 );
@@ -149,6 +154,10 @@ int	main (void) {
 	// Set up the Advanced Interrupt Controller AIC for Timer 0
 	// --------------------------------------------------------
 	
+	volatile AT91PS_PMC	pPMC = AT91C_BASE_PMC;
+	// enable Timer0 peripheral clock
+	pPMC->PMC_PCER = (1<<AT91C_ID_TC0);
+
 	// pointer to AIC data structure  
 	volatile AT91PS_AIC	pAIC = AT91C_BASE_AIC;
 										
