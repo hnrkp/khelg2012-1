@@ -49,7 +49,7 @@ OBJCOPYOPTIONS_BIN = -O binary ${builddir}/$(BINARY).elf
 
 ASFILES = crt.s fundamentals.s
 THUMBFILES =  lowlevelinit.c main.c timerisr.c timersetup.c interrupt_Usart.c cdc_enumerate.c  blinker.c \
-soft_synth.c tune.c
+soft_synth.c tune.c lib_AT91SAM7S256.c
 ARMFILES =
 #ARMFILES =   
 ARMFILES += isrsupport.c

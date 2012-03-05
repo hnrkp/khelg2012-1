@@ -112,17 +112,6 @@ AT91F_Fiq_Handler:
 				ldr		r12, =AT91C_AIC_FVR
 				ldr		r11, [r12]
 				
-/* Turn on LED3 (write 0x0008 to PIOA_CODR at 0xFFFFF434) */
-				ldr		r12, =AT91C_PIOA_CODR
-				mov		r11, #0x04
-				str		r11, [r12]
-
-/* Increment the _FiqCount variable */
-				ldr		r12, =FiqCount
-				ldr		r11, [r12]
-				add		r11, r11, #1
-				str		r11, [r12]
-
 /* Return from Fiq interrupt */
 				movs	pc, lr
 

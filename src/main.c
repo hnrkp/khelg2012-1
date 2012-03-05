@@ -2,7 +2,7 @@
 #include "board.h"
 #include "cdc_enumerate.h"
 #include "soft_synth.h"
-//#include "lib_AT91SAM7S256.h"
+#include "lib_AT91SAM7S256.h"
 
 
 #define BLINK_DURING_USB_ENUM	0
@@ -10,38 +10,14 @@
 #define BLINK_CPU_USAGE			1
 
 extern	void LowLevelInit(void);
-
-
-// FIXME fix the lib_* include so that this isn't needed anymore!
-extern void Usart_init ( void );
-
-// This is used for putchar over serial, but let's use USB CDC ACM
-//extern void AT91F_US_Put( char *buffer);
-
-extern void AT91F_PIO_CfgOutput(
-		AT91PS_PIO pPio,             // \arg pointer to a PIO controller
-		unsigned int pioEnable);
-
-extern void AT91F_PIO_ClearOutput(
-	AT91PS_PIO pPio,   // \arg  pointer to a PIO controller
-	unsigned int flag);
-
-#if 0
-void Timer0IrqHandler(void);
-void FiqHandler(void);
-
 extern	void TimerSetup(void);
-extern	unsigned enableIRQ(void);
-extern	unsigned enableFIQ(void);
-#endif
+extern  void enableIRQ(void);
 
 #define MSG_SIZE 				100
 
 //  *******************************************************
 //               Global Variables
 //  *******************************************************
-unsigned int	FiqCount = 0;
-
 struct _AT91S_CDC 	pCDC;
 static struct SYNTH_Device_t synth_dev;
 
@@ -79,8 +55,9 @@ static void audio_dac(int vol) {
 	else
 		pPIO->PIO_SODR = LED1;
 #endif
-  	AT91C_BASE_PWMC_CH0->PWMC_CUPDR = 257-vol; // errata for pwm on AT91 is thiiiiiiick, never do duty full nor low
-}
+  	AT91C_BASE_PWMC_CH0->PWMC_CUPDR = 257-vol;
+  	 // errata for pwm on AT91 is thiiiiiiick, never do duty full nor low
+ }
 
 void Timer0IrqHandler() {
 #if BLINK_CPU_USAGE
@@ -95,33 +72,13 @@ void Timer0IrqHandler() {
 #endif
 }
 
-//  *******************************************************
-//                     MAIN
-//  ******************************************************/
-int	main (void) {
-#if 0
-	unsigned volatile long	j;								// loop counter (stack variable)
-	unsigned long	IdleCount = 0;					// idle loop blink counter (2x)
-#endif
-	
-	// Initialize the Atmel AT91SAM7S256 (watchdog, PLL clock, default interrupts, etc.)
-	// ---------------------------------------------------------------------------------
-	LowLevelInit();
-
-	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
-	// PIO Output Enable Register - sets pins P0 - P3 to outputs
-	pPIO->PIO_OER = LED_MASK;
-	
-	// PIO Set Output Data Register - turns off the four LEDs
-	pPIO->PIO_SODR = LED_MASK;						
-	pPIO->PIO_CODR = LED1;
-
+static void setup_synthesizer() {
 	//
 	// Set up audio and tune
 	//
     synth_init(&synth_dev, audio_dac, 2, 50);
     tune_init(&synth_dev);
-    synth_dev.gain = 256/6;
+    synth_dev.gain = 256/5;
 
     //
     // Set up pwm for doing dac stuff
@@ -182,41 +139,32 @@ int	main (void) {
 	TimerSetup();
 
 	enableIRQ();
+}
 
-
+//  *******************************************************
+//                     MAIN
+//  ******************************************************/
+int	main (void) {
 #if 0
-	// Set up the Advanced Interrupt Controller AIC for FIQ (pushbutton SW1)
-	// ---------------------------------------------------------------------
-	
-    // Disable FIQ interrupt in AIC Interrupt Disable Command Register	
-	pAIC->AIC_IDCR = (1<<AT91C_ID_FIQ);													
-	
-	// Set the interrupt source type in AIC Source Mode Register[0]
-	pAIC->AIC_SMR[AT91C_ID_FIQ] = (AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE);		
-	
-	// Clear the FIQ interrupt in AIC Interrupt Clear Command Register
-	pAIC->AIC_ICCR = (1<<AT91C_ID_FIQ); 										
-	
-	// Remove disable FIQ interrupt in AIC Interrupt Disable Command Register		
-	pAIC->AIC_IDCR = (0<<AT91C_ID_FIQ);												
-	
-	// Enable the FIQ interrupt in AIC Interrupt Enable Command Register
-	pAIC->AIC_IECR = (1<<AT91C_ID_FIQ); 										
-	
-	
-	// Setup timer0 to generate a 50 msec periodic interrupt
-	// -----------------------------------------------------
-	
-	TimerSetup();
-
-
-	// enable interrupts
-	// -----------------
-	
-	enableIRQ();
-	enableFIQ();
+	unsigned volatile long	j;								// loop counter (stack variable)
+	unsigned long	IdleCount = 0;					// idle loop blink counter (2x)
 #endif
-    // Init USB device
+
+	// Initialize the Atmel AT91SAM7S256 (watchdog, PLL clock, default interrupts, etc.)
+	// ---------------------------------------------------------------------------------
+	LowLevelInit();
+
+	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
+	// PIO Output Enable Register - sets pins P0 - P3 to outputs
+	pPIO->PIO_OER = LED_MASK;
+
+	// PIO Set Output Data Register - turns off the four LEDs
+	pPIO->PIO_SODR = LED_MASK;
+	pPIO->PIO_CODR = LED1;
+
+	setup_synthesizer();
+
+	// Init USB device
    AT91F_USB_Open();
 
   // Init USB device
@@ -255,5 +203,6 @@ int	main (void) {
 		pCDC.Write(&pCDC, data, length);
 		arne();
     }
+    return 0;
 }
 
