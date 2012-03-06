@@ -25,11 +25,11 @@ void  blinker(unsigned char    code) {
 	while (1)  {	
 		for  (j = code; j != 0; j--) {						// count out the proper number of blinks
 			pPIO->PIO_CODR = LED1;							// turn LED1 (DS1) on	
-			for (k = 600000; k != 0; k-- );					// wait 250 msec
+			for (k = 300000; k != 0; k-- );					// wait 250 msec
 			pPIO->PIO_SODR = LED1;							// turn LED1 (DS1) off
-			for (k = 600000; k != 0; k-- );					// wait 250 msec
+			for (k = 300000; k != 0; k-- );					// wait 250 msec
 		}
-		for (k = 5000000; (code != 0) && (k != 0); k-- );	// wait 2 seconds
+		for (k = 500000; (code != 0) && (k != 0); k-- );	// wait 2 seconds
 		blinkcount++;
 	}	
 }
