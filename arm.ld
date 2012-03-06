@@ -136,16 +136,16 @@ SECTIONS
 		*(.glue_7t)						/* all .glue_7t sections (no idea what these are) */
 		*(.gcc_except_table)
 		*(.gnu.linkonce.r.*)
-		. = ALIGN(4);
+		. = ALIGN(4); /* remove to crash */
 		_etext = .;						/* define a global symbol _etext just after the last code byte */
 	} >flash							/* put all the above into FLASH */
 	
 	.data :								/* collect all initialized .data sections that go into RAM  */ 
 	{
 		_data = .;						/* create a global symbol marking the start of the .data section  */
-		*(.ramfunc)
 		*(.data)						/* all .data sections  */
-		. = ALIGN(4);
+		*(.ramfunc)
+		/*. = ALIGN(4);*/
 		_edata = .;						/* define a global symbol marking the end of the .data section  */
 	} >ram AT >flash          			/* put all the above into RAM (but load the LMA initializer copy into FLASH)  */
 

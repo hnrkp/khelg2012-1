@@ -48,11 +48,10 @@ OBJCOPYOPTIONS_BIN = -O binary ${builddir}/$(BINARY).elf
 ###############
 
 ASFILES = crt.s fundamentals.s
-THUMBFILES =  lowlevelinit.c main.c timerisr.c timersetup.c interrupt_Usart.c cdc_enumerate.c  blinker.c \
-soft_synth.c tune.c lib_AT91SAM7S256.c
+THUMBFILES =  lowlevelinit.c main.c timerisr.c timersetup.c interrupt_Usart.c cdc_enumerate.c 
+THUMBFILES += soft_synth.c tune.c lib_AT91SAM7S256.c 
 ARMFILES =
-#ARMFILES =   
-ARMFILES += isrsupport.c
+ARMFILES += isrsupport.c error_handler.c
 
 LIBS=
 
@@ -101,7 +100,7 @@ $(ASOBJFILES) : ${builddir}/${armdir}/%.o:%.s
 # compile c files, arm
 $(ARMOBJFILES) : ${builddir}/${armdir}/%.o:%.c
 		@echo "... arm compile $@"
-		@${CC} -c -o $@ $<
+		@${CC} -marm -c -o $@ $<
 
 # compile c files, thumb
 $(THUMBOBJFILES) : ${builddir}/${thumbdir}/%.o:%.c
@@ -119,7 +118,7 @@ $(THUMBDEPFILES) : ${builddir}/${thumbdir}/%.d:%.c
 $(ARMDEPFILES) : ${builddir}/${armdir}/%.d:%.c
 		@echo "... arm dep $@"; \
 		rm -f $@; \
-		${CC} $(COMPILEROPTIONS) -M $< > $@.$$$$; \
+		${CC} $(COMPILEROPTIONS) -M -marm $< > $@.$$$$; \
 		sed 's,\($*\)\.o[ :]*, ${builddir}/${armdir}/\1.o $@ : ,g' < $@.$$$$ > $@; \
 		rm -f $@.$$$$
 

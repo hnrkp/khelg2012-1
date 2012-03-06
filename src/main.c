@@ -158,7 +158,7 @@ int	main (void) {
 	// PIO Output Enable Register - sets pins P0 - P3 to outputs
 	pPIO->PIO_OER = LED_MASK;
 
-	// PIO Set Output Data Register - turns off the four LEDs
+	// PIO Set Output Data Register - turn off LEDs
 	pPIO->PIO_SODR = LED_MASK;
 	pPIO->PIO_CODR = LED1;
 
