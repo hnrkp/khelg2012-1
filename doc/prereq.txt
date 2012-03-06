@@ -4,12 +4,13 @@ Förberedelser:
 
  * Ladda ner toolchain. Vi rekommenderar CodeSourcerys arm-2011.09. Finns på deras vanliga site, eller http://lk.fulhack.info/tmp/arm-2011.09-69-arm-none-eabi-i686-pc-linux-gnu.tar.bz2 . Packa gärna upp och fixa så din $PATH pekar in i den översta bin-katalogen.
 
- * $ apt-get install ia32-libs om du kör 64bitarsdistro (ubuntu eller debian då, annars får du själv lura ut vad som behövs).
+ * $ apt-get install build-essential # borde ni redan ha gjort, men man vet aldrig.
+
+ * $ apt-get install ia32-libs om du kör 64bitarsdistro (ubuntu eller debian då, annars får du själv lura ut vad som behövs, men toolchainen ska kunna kompilera och länka).
 
  * $ apt-get install openocd # se till att det är minst version 0.4.0 (om inte så har du en uråldrig distribution och bör fixa det, 0.5.0 är rekommenderat dock.)
 
- * En editor får du skaffa. Eclipse har vi färdigt projekt för, men annars rekommenderas vim. I nödfall emacs. Definitivt inte nano eller gedit. Kör du eclipse så se till att C-miljön är nere, annars blir du inte gladare av att ha eclipse installerat..
+ * En editor får du skaffa. Eclipse har vi färdigt projekt för, men annars rekommenderas vim. I nödfall emacs. Definitivt inte nano eller gedit. Kör du eclipse så se till att C-miljön (CDT) är installerad, ty du blir inte gladare av att ha installerat endast java for enterprise with extra sql bindings..
 
  * Labben kommer avkräva er minst två usbportar. Har du inte två lediga så ta med en hubb.
 
- * ..vad mer?
