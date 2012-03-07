@@ -144,7 +144,6 @@ SECTIONS
 	{
 		_data = .;						/* create a global symbol marking the start of the .data section  */
 		*(.data)						/* all .data sections  */
-		*(.ramfunc)
 		/*. = ALIGN(4);*/
 		_edata = .;						/* define a global symbol marking the end of the .data section  */
 	} >ram AT >flash          			/* put all the above into RAM (but load the LMA initializer copy into FLASH)  */
