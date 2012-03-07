@@ -41,12 +41,6 @@ void AT91F_USB_Open(void)
     AT91F_CDC_Open(&pCDC, AT91C_BASE_UDP);
 }
 
-__attribute__ ((section (".ramfunc")))
-void arne(void)
-{
-	pCDC.Write(&pCDC, "ARNEN!\n", 7);
-}
-
 static void audio_dac(int vol) {
 #if BLINK_AUDIO
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
@@ -180,11 +174,10 @@ int	main (void) {
 	else
 		pPIO->PIO_CODR = LED1;
 #endif
-   }
+    }
 
-   // yaay, connected
+    // yaay, connected
     pPIO->PIO_CODR = LED1;
-    //while(1);
 
     // Set Usart in interrupt
     //Usart_init();
@@ -200,9 +193,10 @@ int	main (void) {
 
     	length = pCDC.Read(&pCDC, data, MSG_SIZE);
     	data[length]=0;
+
 		pCDC.Write(&pCDC, data, length);
-		arne();
     }
+
     return 0;
 }
 
