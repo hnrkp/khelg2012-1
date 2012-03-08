@@ -5,9 +5,10 @@
 #include "lib_AT91SAM7S256.h"
 
 
-#define BLINK_DURING_USB_ENUM	0
+#define BLINK_DURING_USB_ENUM	1
 #define BLINK_AUDIO				0
-#define BLINK_CPU_USAGE			1
+#define BLINK_CPU_USAGE			0
+#define MEASURE_AUDIO_CPU_USAGE 1
 
 extern	void LowLevelInit(void);
 extern	void TimerSetup(void);
@@ -18,8 +19,14 @@ extern  void enableIRQ(void);
 //  *******************************************************
 //               Global Variables
 //  *******************************************************
+// USB CDC struct
 struct _AT91S_CDC 	pCDC;
+// soft synth device struct
 static struct SYNTH_Device_t synth_dev;
+#if MEASURE_AUDIO_CPU_USAGE
+// cpu measurements ends up here
+volatile static int audio_cpu_ticks = 0;
+#endif
 
 void AT91F_USB_Open(void)
 {
@@ -54,15 +61,30 @@ static void audio_dac(int vol) {
  }
 
 void Timer0IrqHandler() {
+	// do cpu measuring
+#if MEASURE_AUDIO_CPU_USAGE
+	AT91C_BASE_TC1->TC_CCR = (1<<2);				// restart timer 1, our 24MHz counter
+#endif
+	// blink cpu usage thru led
 #if BLINK_CPU_USAGE
 	volatile AT91PS_PIO	pPIO = AT91C_BASE_PIOA;
 	pPIO->PIO_SODR = LED1;
 #endif
-	volatile AT91PS_TC 		pTC = AT91C_BASE_TC0;		// pointer to timer channel 0 register structure
-	pTC->TC_SR++;									// read TC0 Status Register to clear it
+
+	// do the actual synth stuff
+	AT91C_BASE_TC0->TC_SR++;						// read TC0 Status Register to clear it
 	synth_tick(&synth_dev);
+
+	// blink cpu usage thru led
 #if BLINK_CPU_USAGE
 	pPIO->PIO_CODR = LED1;
+#endif
+	// do cpu measuring
+#if MEASURE_AUDIO_CPU_USAGE
+	{
+		int meas = AT91C_BASE_TC1->TC_CV;			// read timer 1 value, use as cycle measurer
+		audio_cpu_ticks = (meas + audio_cpu_ticks) / 2;
+	}
 #endif
 }
 
@@ -130,8 +152,19 @@ static void setup_synthesizer() {
 	// Enable the TC0 interrupt in AIC Interrupt Enable Command Register
 	pAIC->AIC_IECR = (1<<AT91C_ID_TC0);
 	
-	TimerSetup();
+	TimerSetup(); // set up softysynth timer
 
+#if MEASURE_AUDIO_CPU_USAGE
+	// q'n'd setup of timer 1 which we use for measuring nbr of cycles
+	pPMC->PMC_PCER = (1<<AT91C_ID_TC1); // enable timer 1 clock
+	AT91PS_TC pTC = AT91C_BASE_TC1;
+	pTC->TC_IDR = 0xff; 				// no interrupts
+	pTC->TC_CMR = 0x4000;				// MCK/2  = 24MHz
+	pTC->TC_RC = 0xffff;				// compare register
+	pTC->TC_CCR = 0x5;					// enable the clock	and start it
+#endif
+
+	// start timer0 irqs so the synth get ticks
 	enableIRQ();
 }
 
